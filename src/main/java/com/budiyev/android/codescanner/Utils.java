@@ -41,6 +41,7 @@ import android.view.WindowManager;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.MultiFormatReader;
@@ -63,18 +64,18 @@ final class Utils {
 
     @NonNull
     public static Point findSuitableImageSize(@NonNull final Parameters parameters,
-            final int frameWidth, final int frameHeight) {
+                                              final int frameWidth, final int frameHeight) {
         final List<Size> sizes = parameters.getSupportedPreviewSizes();
         if (sizes != null && !sizes.isEmpty()) {
             Collections.sort(sizes, new CameraSizeComparator());
             final float frameRatio = (float) frameWidth / (float) frameHeight;
             for (float distortion = MIN_DISTORTION; distortion <= MAX_DISTORTION;
-                    distortion += DISTORTION_STEP) {
+                 distortion += DISTORTION_STEP) {
                 for (final Size size : sizes) {
                     final int width = size.width;
                     final int height = size.height;
                     if (width * height >= MIN_PREVIEW_PIXELS &&
-                            Math.abs(frameRatio - (float) width / (float) height) <= distortion) {
+                        Math.abs(frameRatio - (float) width / (float) height) <= distortion) {
                         return new Point(width, height);
                     }
                 }
@@ -95,9 +96,9 @@ final class Utils {
         Collections.sort(supportedFpsRanges, new FpsRangeComparator());
         for (final int[] fpsRange : supportedFpsRanges) {
             if (fpsRange[Parameters.PREVIEW_FPS_MIN_INDEX] >= MIN_FPS &&
-                    fpsRange[Parameters.PREVIEW_FPS_MAX_INDEX] <= MAX_FPS) {
+                fpsRange[Parameters.PREVIEW_FPS_MAX_INDEX] <= MAX_FPS) {
                 parameters.setPreviewFpsRange(fpsRange[Parameters.PREVIEW_FPS_MIN_INDEX],
-                        fpsRange[Parameters.PREVIEW_FPS_MAX_INDEX]);
+                    fpsRange[Parameters.PREVIEW_FPS_MAX_INDEX]);
                 return;
             }
         }
@@ -107,7 +108,7 @@ final class Utils {
         if (!Parameters.SCENE_MODE_BARCODE.equals(parameters.getSceneMode())) {
             final List<String> supportedSceneModes = parameters.getSupportedSceneModes();
             if (supportedSceneModes != null &&
-                    supportedSceneModes.contains(Parameters.SCENE_MODE_BARCODE)) {
+                supportedSceneModes.contains(Parameters.SCENE_MODE_BARCODE)) {
                 parameters.setSceneMode(Parameters.SCENE_MODE_BARCODE);
             }
         }
@@ -120,14 +121,16 @@ final class Utils {
     }
 
     public static void configureFocusArea(@NonNull final Parameters parameters,
-            @NonNull final Rect area, final int width, final int height, final int orientation) {
+                                          @NonNull final Rect area, final int width, final int height, final int orientation) {
         final List<Area> areas = new ArrayList<>(1);
         final Rect rotatedArea =
-                area.rotate(-orientation, width / 2f, height / 2f).bound(0, 0, width, height);
-        areas.add(new Area(new android.graphics.Rect(mapCoordinate(rotatedArea.getLeft(), width),
-                mapCoordinate(rotatedArea.getTop(), height),
-                mapCoordinate(rotatedArea.getRight(), width),
-                mapCoordinate(rotatedArea.getBottom(), height)), 1000));
+            area.rotate(-orientation, width / 2f, height / 2f).bound(0, 0, width, height);
+        areas.add(new Area(new android.graphics.Rect(
+            mapCoordinate(rotatedArea.getLeft(), width),
+            mapCoordinate(rotatedArea.getTop(), height),
+            mapCoordinate(rotatedArea.getRight(), width),
+            mapCoordinate(rotatedArea.getBottom(), height)), 1000)
+        );
         if (parameters.getMaxNumFocusAreas() > 0) {
             parameters.setFocusAreas(areas);
         }
@@ -137,23 +140,23 @@ final class Utils {
     }
 
     public static void configureDefaultFocusArea(@NonNull final Parameters parameters,
-            @NonNull final Rect frameRect, @NonNull final Point previewSize,
-            @NonNull final Point viewSize, final int width, final int height,
-            final int orientation) {
+                                                 @NonNull final Rect frameRect, @NonNull final Point previewSize,
+                                                 @NonNull final Point viewSize, final int width, final int height,
+                                                 final int orientation) {
         final boolean portrait = isPortrait(orientation);
         final int rotatedWidth = portrait ? height : width;
         final int rotatedHeight = portrait ? width : height;
         configureFocusArea(parameters,
-                getImageFrameRect(rotatedWidth, rotatedHeight, frameRect, previewSize, viewSize),
-                rotatedWidth, rotatedHeight, orientation);
+            getImageFrameRect(rotatedWidth, rotatedHeight, frameRect, previewSize, viewSize),
+            rotatedWidth, rotatedHeight, orientation);
     }
 
     public static void configureDefaultFocusArea(@NonNull final Parameters parameters,
-            @NonNull final DecoderWrapper decoderWrapper, @NonNull final Rect frameRect) {
+                                                 @NonNull final DecoderWrapper decoderWrapper, @NonNull final Rect frameRect) {
         final Point imageSize = decoderWrapper.getImageSize();
         Utils.configureDefaultFocusArea(parameters, frameRect, decoderWrapper.getPreviewSize(),
-                decoderWrapper.getViewSize(), imageSize.getX(), imageSize.getY(),
-                decoderWrapper.getDisplayOrientation());
+            decoderWrapper.getViewSize(), imageSize.getX(), imageSize.getY(),
+            decoderWrapper.getDisplayOrientation());
     }
 
     public static void configureFocusModeForTouch(@NonNull final Parameters parameters) {
@@ -188,7 +191,7 @@ final class Utils {
     }
 
     public static void setAutoFocusMode(@NonNull final Parameters parameters,
-            final AutoFocusMode autoFocusMode) {
+                                        final AutoFocusMode autoFocusMode) {
         final List<String> focusModes = parameters.getSupportedFocusModes();
         if (focusModes == null || focusModes.isEmpty()) {
             return;
@@ -211,7 +214,7 @@ final class Utils {
     }
 
     public static void setFlashMode(@NonNull final Parameters parameters,
-            @NonNull final String flashMode) {
+                                    @NonNull final String flashMode) {
         if (flashMode.equals(parameters.getFlashMode())) {
             return;
         }
@@ -231,9 +234,9 @@ final class Utils {
     }
 
     public static int getDisplayOrientation(@NonNull final Context context,
-            @NonNull final CameraInfo cameraInfo) {
+                                            @NonNull final CameraInfo cameraInfo) {
         final WindowManager windowManager =
-                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         if (windowManager == null) {
             throw new CodeScannerException("Unable to access window manager");
         }
@@ -260,7 +263,7 @@ final class Utils {
                 }
         }
         return ((cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT ? 180 : 360) +
-                cameraInfo.orientation - degrees) % 360;
+            cameraInfo.orientation - degrees) % 360;
     }
 
     public static boolean isPortrait(final int orientation) {
@@ -269,7 +272,7 @@ final class Utils {
 
     @NonNull
     public static Point getPreviewSize(final int imageWidth, final int imageHeight,
-            final int frameWidth, final int frameHeight) {
+                                       final int frameWidth, final int frameHeight) {
         if (imageWidth == frameWidth && imageHeight == frameHeight) {
             return new Point(frameWidth, frameHeight);
         }
@@ -283,8 +286,8 @@ final class Utils {
 
     @NonNull
     public static Rect getImageFrameRect(final int imageWidth, final int imageHeight,
-            @NonNull final Rect viewFrameRect, @NonNull final Point previewSize,
-            @NonNull final Point viewSize) {
+                                         @NonNull final Rect viewFrameRect, @NonNull final Point previewSize,
+                                         @NonNull final Point viewSize) {
         final int previewWidth = previewSize.getX();
         final int previewHeight = previewSize.getY();
         final int viewWidth = viewSize.getX();
@@ -294,14 +297,14 @@ final class Utils {
         final float wR = (float) imageWidth / (float) previewWidth;
         final float hR = (float) imageHeight / (float) previewHeight;
         return new Rect(Math.max(Math.round((viewFrameRect.getLeft() + wD) * wR), 0),
-                Math.max(Math.round((viewFrameRect.getTop() + hD) * hR), 0),
-                Math.min(Math.round((viewFrameRect.getRight() + wD) * wR), imageWidth),
-                Math.min(Math.round((viewFrameRect.getBottom() + hD) * hR), imageHeight));
+            Math.max(Math.round((viewFrameRect.getTop() + hD) * hR), 0),
+            Math.min(Math.round((viewFrameRect.getRight() + wD) * wR), imageWidth),
+            Math.min(Math.round((viewFrameRect.getBottom() + hD) * hR), imageHeight));
     }
 
     @NonNull
     public static byte[] rotateYuv(@NonNull final byte[] source, final int width, final int height,
-            final int rotation) {
+                                   final int rotation) {
         if (rotation == 0 || rotation == 360) {
             return source;
         }
@@ -337,12 +340,12 @@ final class Utils {
 
     @Nullable
     public static Result decodeLuminanceSource(@NonNull final MultiFormatReader reader,
-            @NonNull final LuminanceSource luminanceSource) throws ReaderException {
+                                               @NonNull final LuminanceSource luminanceSource) throws ReaderException {
         try {
             return reader.decodeWithState(new BinaryBitmap(new HybridBinarizer(luminanceSource)));
         } catch (final NotFoundException e) {
             return reader.decodeWithState(
-                    new BinaryBitmap(new HybridBinarizer(luminanceSource.invert())));
+                new BinaryBitmap(new HybridBinarizer(luminanceSource.invert())));
         } finally {
             reader.reset();
         }
@@ -358,7 +361,7 @@ final class Utils {
     @NonNull
     @SuppressWarnings("deprecation")
     public static Drawable getDrawable(@NonNull final Context context,
-            @DrawableRes final int resId) {
+                                       @DrawableRes final int resId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return context.getDrawable(resId);
         } else {
@@ -381,10 +384,10 @@ final class Utils {
         @Override
         public int compare(final int[] a, final int[] b) {
             int comparison = Integer.compare(b[Parameters.PREVIEW_FPS_MAX_INDEX],
-                    a[Parameters.PREVIEW_FPS_MAX_INDEX]);
+                a[Parameters.PREVIEW_FPS_MAX_INDEX]);
             if (comparison == 0) {
                 comparison = Integer.compare(b[Parameters.PREVIEW_FPS_MIN_INDEX],
-                        a[Parameters.PREVIEW_FPS_MIN_INDEX]);
+                    a[Parameters.PREVIEW_FPS_MIN_INDEX]);
             }
             return comparison;
         }

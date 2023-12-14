@@ -25,6 +25,7 @@ package com.budiyev.android.codescanner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.ReaderException;
@@ -41,9 +42,9 @@ final class DecodeTask {
     private final boolean mReverseHorizontal;
 
     public DecodeTask(@NonNull final byte[] image, @NonNull final Point imageSize,
-            @NonNull final Point previewSize, @NonNull final Point viewSize,
-            @NonNull final Rect viewFrameRect, final int orientation,
-            final boolean reverseHorizontal) {
+                      @NonNull final Point previewSize, @NonNull final Point viewSize,
+                      @NonNull final Rect viewFrameRect, final int orientation,
+                      final boolean reverseHorizontal) {
         mImage = image;
         mImageSize = imageSize;
         mPreviewSize = previewSize;
@@ -65,16 +66,20 @@ final class DecodeTask {
             imageWidth = imageHeight;
             imageHeight = width;
         }
-        final Rect frameRect =
-                Utils.getImageFrameRect(imageWidth, imageHeight, mViewFrameRect, mPreviewSize,
-                        mViewSize);
+        final Rect frameRect = Utils.getImageFrameRect(
+            imageWidth,
+            imageHeight,
+            mViewFrameRect,
+            mPreviewSize,
+            mViewSize
+        );
         final int frameWidth = frameRect.getWidth();
         final int frameHeight = frameRect.getHeight();
         if (frameWidth < 1 || frameHeight < 1) {
             return null;
         }
         return Utils.decodeLuminanceSource(reader,
-                new PlanarYUVLuminanceSource(image, imageWidth, imageHeight, frameRect.getLeft(),
-                        frameRect.getTop(), frameWidth, frameHeight, mReverseHorizontal));
+            new PlanarYUVLuminanceSource(image, imageWidth, imageHeight, frameRect.getLeft(),
+                frameRect.getTop(), frameWidth, frameHeight, mReverseHorizontal));
     }
 }
